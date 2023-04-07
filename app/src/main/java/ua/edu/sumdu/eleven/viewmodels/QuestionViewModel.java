@@ -31,4 +31,12 @@ public class QuestionViewModel extends AndroidViewModel {
     public void insert(Question question) {
         mRepository.insert(question);
     }
+
+    public void update(Question... questions) {
+        mRepository.update(questions);
+    }
+
+    public void delete(Question question) {
+        mRepository.delete(question);
+    }
 }

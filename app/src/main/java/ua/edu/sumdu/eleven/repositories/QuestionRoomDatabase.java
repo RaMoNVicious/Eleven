@@ -52,7 +52,8 @@ public abstract class QuestionRoomDatabase extends RoomDatabase {
         @Override
         public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
-            new PopulateDbAsync(INSTANCE).execute();
+            // TODO: uncomment if initial data required
+            //new PopulateDbAsync(INSTANCE).execute();
         }
     };
 

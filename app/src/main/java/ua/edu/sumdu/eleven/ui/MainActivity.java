@@ -2,7 +2,6 @@ package ua.edu.sumdu.eleven.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Pair;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,17 +25,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         RecyclerView list = findViewById(R.id.lst_questions);
-        final QuestionListAdapter adapter = new QuestionListAdapter(this);
+        final QuestionListAdapter adapter = new QuestionListAdapter(
+                this,
+                new QuestionListAdapter.OnClickListener() {
+                    @Override
+                    public void onClick(Question question) {
+                        showQuestion(question);
+                    }
+
+                    @Override
+                    public void onDelete(Question question) {
+                        viewModel.delete(question);
+                    }
+                }
+        );
         list.setAdapter(adapter);
 
         viewModel = new ViewModelProvider(this).get(QuestionViewModel.class);
         viewModel.getAllQuestions().observe(this, adapter::setItems);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            Intent intent = new Intent(this, QuestionActivity.class);
-            startActivityForResult(intent, NEW_ITEM_REQUEST_CODE);
-        });
+        fab.setOnClickListener(view -> showQuestion(null));
+    }
+
+    private void showQuestion(Question question) {
+        Intent intent = new Intent(this, QuestionActivity.class);
+        if (question != null) {
+            intent.putExtra(QuestionActivity.EXTRA_REPLY, question);
+        }
+        startActivityForResult(intent, NEW_ITEM_REQUEST_CODE);
     }
 
     @Override
@@ -47,7 +64,11 @@ public class MainActivity extends AppCompatActivity {
                 && data != null && data.hasExtra(QuestionActivity.EXTRA_REPLY)
         ) {
             Question question = (Question) data.getSerializableExtra(QuestionActivity.EXTRA_REPLY);
-            viewModel.insert(question);
+            if (question.getId() == 0) {
+                viewModel.insert(question);
+            } else {
+                viewModel.update(question);
+            }
         }
     }
 }

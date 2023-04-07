@@ -14,9 +14,11 @@ import ua.edu.sumdu.eleven.models.Question;
 
 public class QuestionActivity extends AppCompatActivity {
     public static final String EXTRA_REPLY =
-            BuildConfig.APPLICATION_ID + "REPLY";
+            BuildConfig.APPLICATION_ID + "_QUESTION";
 
     private TextView mTxtQuestion, mTxtAnswer;
+
+    private Question mQuestion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,12 @@ public class QuestionActivity extends AppCompatActivity {
 
         mTxtQuestion = findViewById(R.id.txt_question);
         mTxtAnswer = findViewById(R.id.txt_answer);
+
+        if (getIntent().hasExtra(EXTRA_REPLY)) {
+            mQuestion = (Question) getIntent().getSerializableExtra(EXTRA_REPLY);
+            mTxtQuestion.setText(mQuestion.getQuestion());
+            mTxtAnswer.setText(mQuestion.getAnswer());
+        }
     }
 
     public void onDoneClick(View view) {
@@ -32,9 +40,16 @@ public class QuestionActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(mTxtQuestion.getText())) {
             setResult(RESULT_CANCELED, intent);
         } else {
-            String question = mTxtQuestion.getText().toString();
-            String answer = mTxtAnswer.getText().toString();
-            intent.putExtra(EXTRA_REPLY, new Question(question, answer));
+            if (mQuestion == null) {
+                mQuestion = new Question(
+                        mTxtQuestion.getText().toString(),
+                        mTxtAnswer.getText().toString()
+                );
+            } else {
+                mQuestion.setQuestion(mTxtQuestion.getText().toString());
+                mQuestion.setAnswer(mTxtAnswer.getText().toString());
+            }
+            intent.putExtra(EXTRA_REPLY, mQuestion);
             setResult(RESULT_OK, intent);
         }
         finish();

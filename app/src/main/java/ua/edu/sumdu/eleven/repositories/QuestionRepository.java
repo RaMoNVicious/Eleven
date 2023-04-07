@@ -10,8 +10,8 @@ import ua.edu.sumdu.eleven.models.Question;
 import ua.edu.sumdu.eleven.models.QuestionDao;
 
 public class QuestionRepository {
-    private QuestionDao mQuestionDao;
-    private LiveData<List<Question>> mAllQuestions;
+    private final QuestionDao mQuestionDao;
+    private final LiveData<List<Question>> mAllQuestions;
 
     public QuestionRepository(Application application) {
         QuestionRoomDatabase db = QuestionRoomDatabase.getDatabase(application);
@@ -27,5 +27,17 @@ public class QuestionRepository {
         QuestionRoomDatabase
                 .databaseWriteExecutor
                 .execute(() -> mQuestionDao.insert(question));
+    }
+
+    public void update(Question... questions) {
+        QuestionRoomDatabase
+                .databaseWriteExecutor
+                .execute(() -> mQuestionDao.updateQuestions(questions));
+    }
+
+    public void delete(Question question) {
+        QuestionRoomDatabase
+                .databaseWriteExecutor
+                .execute(() -> mQuestionDao.delete(question));
     }
 }
